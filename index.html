@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorador Interactivo de SMTP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Neutral Tech -->
+    <!-- Application Structure Plan: La aplicación está diseñada con una estructura temática no lineal para facilitar el aprendizaje y la exploración. En lugar de seguir el orden del informe académico, se divide en cinco secciones principales accesibles a través de una barra de navegación fija: "Fundamentos", "Mecánica de la Sesión", "Evolución Histórica", "Seguridad" y "Ecosistema Completo". Esta arquitectura permite a los usuarios saltar directamente al tema de su interés. Se utilizan elementos interactivos clave como un diagrama de sesión SMTP paso a paso y una línea de tiempo de RFCs para visualizar procesos complejos, y un gráfico de radar para comparar tecnologías de seguridad, transformando el texto denso en una experiencia de aprendizaje atractiva y digerible. -->
+    <!-- Visualization & Content Choices: 
+        - Agentes del Correo (MUA/MSA/MTA): (Objetivo: Informar, Método: Tarjetas HTML/CSS interactivas, Justificación: Presenta los componentes clave del ecosistema de forma clara y separada).
+        - Sobre vs. Contenido: (Objetivo: Informar/Comparar, Método: Diagrama visual con HTML/CSS, Justificación: Ilustra una vulnerabilidad fundamental de forma mucho más clara que el texto solo).
+        - Sesión SMTP: (Objetivo: Organizar/Mostrar Cambio, Método: Diagrama de flujo interactivo con HTML/CSS+JS, Justificación: Demuestra el diálogo secuencial del protocolo, permitiendo al usuario explorar cada paso a su propio ritmo).
+        - Evolución de RFCs: (Objetivo: Mostrar Cambio, Método: Línea de tiempo vertical interactiva con HTML/CSS+JS, Justificación: Visualiza la progresión histórica de los estándares de una manera intuitiva).
+        - SPF vs. DKIM vs. DMARC: (Objetivo: Comparar, Método: Gráfico de radar con Chart.js/Canvas, Justificación: Permite una comparación visual y multidimensional de las fortalezas y debilidades de cada protocolo de autenticación).
+        - SMTP vs. POP3 vs. IMAP: (Objetivo: Comparar, Método: Tabla comparativa HTML/CSS interactiva, Justificación: Ofrece una referencia rápida y clara de las funciones de cada protocolo en el ecosistema del correo).
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f4; /* stone-100 */
+            color: #292524; /* stone-800 */
+        }
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            border-bottom-color: #2563eb; /* blue-600 */
+            color: #1e40af; /* blue-800 */
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            background-color: white;
+            border: 3px solid #60a5fa; /* blue-400 */
+            left: -0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <h1 class="text-2xl font-bold text-stone-900">Explorador Interactivo de SMTP</h1>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#fundamentos" class="nav-link text-stone-600 font-medium pb-1">Fundamentos</a>
+                    <a href="#mecanica" class="nav-link text-stone-600 font-medium pb-1">Mecánica</a>
+                    <a href="#evolucion" class="nav-link text-stone-600 font-medium pb-1">Evolución</a>
+                    <a href="#seguridad" class="nav-link text-stone-600 font-medium pb-1">Seguridad</a>
+                    <a href="#ecosistema" class="nav-link text-stone-600 font-medium pb-1">Ecosistema</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <!-- Sección 1: Fundamentos -->
+        <section id="fundamentos" class="content-section space-y-12">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-stone-900">Fundamentos de SMTP</h2>
+                <p class="mt-2 text-lg text-stone-600 max-w-3xl mx-auto">El Protocolo Simple de Transferencia de Correo es la columna vertebral del email. Descubre sus componentes clave y conceptos esenciales.</p>
+            </div>
+
+            <div>
+                <h3 class="text-2xl font-semibold mb-4 text-stone-800">Los Agentes del Correo Electrónico</h3>
+                <p class="mb-6 text-stone-600">El envío de un correo electrónico involucra a varios actores de software que trabajan en conjunto. Cada uno tiene un rol específico en el viaje del mensaje desde el remitente hasta el destinatario.</p>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-stone-200">
+                        <h4 class="font-bold text-lg text-blue-700">MUA (Mail User Agent)</h4>
+                        <p class="mt-2 text-stone-600">Es la aplicación que usas: Outlook, Gmail, Apple Mail. Te permite leer, escribir y gestionar tus correos. Es el punto de inicio y fin para el usuario.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-stone-200">
+                        <h4 class="font-bold text-lg text-blue-700">MSA (Mail Submission Agent)</h4>
+                        <p class="mt-2 text-stone-600">El primer servidor que recibe tu correo desde el MUA. Su trabajo es autenticarte y pasar el mensaje al MTA para su envío. Opera típicamente en el puerto 587.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-stone-200">
+                        <h4 class="font-bold text-lg text-blue-700">MTA (Mail Transfer Agent)</h4>
+                        <p class="mt-2 text-stone-600">El "cartero" de Internet. Es el software que usa SMTP para retransmitir el correo de un servidor a otro hasta llegar al destino final. Actúa como cliente y servidor SMTP.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-2xl font-semibold mb-4 text-stone-800">El Sobre vs. El Contenido: La Vulnerabilidad Original</h3>
+                <p class="mb-6 text-stone-600">Una de las características más importantes y problemáticas de SMTP es la separación entre la información de transporte (el sobre) y el mensaje visible (el contenido). Esta dualidad es la raíz del 'spoofing' o suplantación de identidad.</p>
+                <div class="grid md:grid-cols-2 gap-8 items-start">
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-stone-200">
+                        <h4 class="font-bold text-lg text-center mb-4">✉️ El Sobre SMTP (RFC 5321)</h4>
+                        <p class="text-sm text-stone-500 text-center mb-4">Usado por los servidores para enrutar el correo. Invisible para el usuario final.</p>
+                        <div class="font-mono text-sm space-y-2 bg-stone-100 p-4 rounded">
+                            <p><span class="text-purple-600 font-semibold">MAIL FROM:</span>&lt;atacante@phishing.com&gt;</p>
+                            <p><span class="text-purple-600 font-semibold">RCPT TO:</span>&lt;victima@empresa.com&gt;</p>
+                        </div>
+                        <p class="mt-4 text-stone-600">El servidor usa estas direcciones para la entrega real y para los informes de error (rebotes).</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-stone-200">
+                        <h4 class="font-bold text-lg text-center mb-4">📄 El Contenido del Mensaje (RFC 5322)</h4>
+                        <p class="text-sm text-stone-500 text-center mb-4">Es lo que ves en tu cliente de correo.</p>
+                        <div class="font-mono text-sm space-y-2 bg-stone-100 p-4 rounded">
+                            <p><span class="text-green-600 font-semibold">From:</span> "CEO" &lt;ceo@empresa.com&gt;</p>
+                            <p><span class="text-green-600 font-semibold">To:</span> &lt;victima@empresa.com&gt;</p>
+                            <p><span class="text-green-600 font-semibold">Subject:</span> ¡Acción Urgente Requerida!</p>
+                        </div>
+                        <p class="mt-4 text-stone-600">El protocolo original no exigía que el `From:` de la cabecera coincidiera con el `MAIL FROM` del sobre, permitiendo la suplantación.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección 2: Mecánica -->
+        <section id="mecanica" class="content-section">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-stone-900">Mecánica de la Sesión SMTP</h2>
+                <p class="mt-2 text-lg text-stone-600 max-w-3xl mx-auto">Explora el diálogo paso a paso entre un cliente y un servidor para enviar un correo. Haz clic en cada paso para ver los detalles.</p>
+            </div>
+            <div class="mt-12 max-w-4xl mx-auto">
+                <div class="flex flex-col md:flex-row justify-between gap-8">
+                    <div class="w-full md:w-1/2 text-center">
+                        <h3 class="text-xl font-semibold mb-4">Cliente SMTP</h3>
+                        <div id="client-commands" class="space-y-4"></div>
+                    </div>
+                    <div class="w-full md:w-1/2 text-center">
+                        <h3 class="text-xl font-semibold mb-4">Servidor SMTP</h3>
+                        <div id="server-responses" class="space-y-4"></div>
+                    </div>
+                </div>
+                <div id="explanation-box" class="mt-8 bg-white p-6 rounded-lg shadow-lg border border-blue-200 transition-all duration-300 opacity-0">
+                    <h4 id="explanation-title" class="font-bold text-lg text-blue-800"></h4>
+                    <p id="explanation-text" class="mt-2 text-stone-600"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección 3: Evolución -->
+        <section id="evolucion" class="content-section">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-stone-900">Evolución Histórica de SMTP</h2>
+                <p class="mt-2 text-lg text-stone-600 max-w-3xl mx-auto">Desde un protocolo basado en la confianza hasta un estándar endurecido. Un viaje a través de los RFCs (Request for Comments) que definieron el correo moderno.</p>
+            </div>
+            <div class="mt-12 max-w-3xl mx-auto">
+                <div id="timeline-container" class="relative border-l-2 border-blue-200 pl-8 space-y-12">
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección 4: Seguridad -->
+        <section id="seguridad" class="content-section">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-stone-900">El Imperativo de la Seguridad</h2>
+                <p class="mt-2 text-lg text-stone-600 max-w-3xl mx-auto">La simplicidad original de SMTP dio lugar a vulnerabilidades. Explora las amenazas y las capas de defensa construidas para proteger el correo electrónico.</p>
+            </div>
+            <div class="mt-12">
+                <h3 class="text-2xl font-semibold text-center mb-6">El Triunvirato de la Autenticación de Dominio</h3>
+                <p class="text-center text-stone-600 mb-8 max-w-3xl mx-auto">Para combatir la suplantación de identidad, se crearon tres protocolos que trabajan juntos: SPF, DKIM y DMARC. Este gráfico compara sus capacidades clave.</p>
+                <div class="chart-container bg-white p-4 rounded-lg shadow-md">
+                    <canvas id="securityProtocolsChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección 5: Ecosistema -->
+        <section id="ecosistema" class="content-section">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-stone-900">El Ecosistema Completo del Correo</h2>
+                <p class="mt-2 text-lg text-stone-600 max-w-3xl mx-auto">SMTP es para enviar, pero ¿cómo recibimos el correo? Compara SMTP con sus contrapartes de recepción, POP3 e IMAP.</p>
+            </div>
+            <div class="mt-12 max-w-5xl mx-auto">
+                <div class="overflow-x-auto">
+                    <table class="w-full bg-white shadow-lg rounded-lg border border-stone-200">
+                        <thead>
+                            <tr class="bg-stone-100">
+                                <th class="p-4 text-left font-semibold">Característica</th>
+                                <th class="p-4 text-left font-semibold">SMTP</th>
+                                <th class="p-4 text-left font-semibold">POP3</th>
+                                <th class="p-4 text-left font-semibold">IMAP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-t border-stone-200">
+                                <td class="p-4 font-medium">Función Principal</td>
+                                <td class="p-4">Envío y retransmisión</td>
+                                <td class="p-4">Recepción y descarga</td>
+                                <td class="p-4">Recepción y sincronización</td>
+                            </tr>
+                            <tr class="border-t border-stone-200 bg-stone-50">
+                                <td class="p-4 font-medium">Tipo de Protocolo</td>
+                                <td class="p-4">Push (Empuje)</td>
+                                <td class="p-4">Pull (Extracción)</td>
+                                <td class="p-4">Pull (Extracción)</td>
+                            </tr>
+                            <tr class="border-t border-stone-200">
+                                <td class="p-4 font-medium">Almacenamiento</td>
+                                <td class="p-4">No almacena (transfiere)</td>
+                                <td class="p-4">Local (borra del servidor)</td>
+                                <td class="p-4">En el servidor</td>
+                            </tr>
+                            <tr class="border-t border-stone-200 bg-stone-50">
+                                <td class="p-4 font-medium">Soporte Multidispositivo</td>
+                                <td class="p-4 text-red-600 font-semibold">N/A</td>
+                                <td class="p-4 text-orange-500 font-semibold">Pobre</td>
+                                <td class="p-4 text-green-600 font-semibold">Excelente</td>
+                            </tr>
+                            <tr class="border-t border-stone-200">
+                                <td class="p-4 font-medium">Puertos Seguros</td>
+                                <td class="p-4">587 (STARTTLS), 465</td>
+                                <td class="p-4">995</td>
+                                <td class="p-4">993</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center py-8 mt-12 border-t border-stone-200">
+        <p class="text-stone-500">Aplicación interactiva generada a partir de una investigación académica sobre SMTP.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.content-section');
+
+            function updateActiveState(hash) {
+                let activeSection = document.querySelector(hash);
+                if (!activeSection) {
+                    activeSection = document.querySelector('#fundamentos');
+                    window.location.hash = '#fundamentos';
+                }
+
+                navLinks.forEach(link => {
+                    if (link.getAttribute('href') === window.location.hash) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+
+                sections.forEach(section => {
+                    if (section.id === activeSection.id) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+            }
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.hash = this.getAttribute('href');
+                });
+            });
+
+            window.addEventListener('hashchange', () => updateActiveState(window.location.hash));
+            updateActiveState(window.location.hash || '#fundamentos');
+
+            // Lógica para la sección de Mecánica
+            const sessionSteps = [
+                { type: 'server', command: '220 server.com ESMTP Service ready', title: '1. Saludo del Servidor', text: 'Una vez que el cliente establece una conexión TCP, el servidor responde con un código 220, indicando que está listo para recibir comandos.' },
+                { type: 'client', command: 'EHLO client.example.com', title: '2. Presentación del Cliente (EHLO)', text: 'El cliente se presenta con EHLO (Extended HELO), solicitando al servidor que anuncie las extensiones que soporta (como AUTH o STARTTLS).' },
+                { type: 'server', command: '250-server.com Hello...', title: '3. Anuncio de Extensiones', text: 'El servidor responde con 250 OK y una lista de sus capacidades, como SIZE (tamaño máximo), AUTH (autenticación), y STARTTLS (cifrado).' },
+                { type: 'client', command: 'MAIL FROM:<sender@example.com>', title: '4. Inicio de Transacción (MAIL FROM)', text: 'El cliente inicia la transferencia de un correo, especificando la dirección del remitente del sobre. Esta es la dirección a la que se enviarán los rebotes.' },
+                { type: 'server', command: '250 2.1.0 OK', title: '5. Aceptación del Remitente', text: 'El servidor confirma que la dirección del remitente es sintácticamente correcta y que está listo para recibir la información del destinatario.' },
+                { type: 'client', command: 'RCPT TO:<recipient@example.net>', title: '6. Especificación del Destinatario (RCPT TO)', text: 'El cliente indica la dirección del destinatario. Se puede enviar un comando RCPT TO por cada destinatario.' },
+                { type: 'server', command: '250 2.1.5 OK', title: '7. Aceptación del Destinatario', text: 'El servidor confirma que puede (o intentará) entregar el correo al destinatario especificado.' },
+                { type: 'client', command: 'DATA', title: '8. Solicitud para Enviar Datos (DATA)', text: 'Una vez aceptados el remitente y al menos un destinatario, el cliente indica que está listo para enviar el contenido del mensaje.' },
+                { type: 'server', command: '354 End data with <CRLF>.<CRLF>', title: '9. Invitación a Enviar', text: 'El servidor responde con un código 354, invitando al cliente a enviar el cuerpo del mensaje y a terminarlo con una línea que contenga solo un punto.' },
+                { type: 'client', command: 'From: ... Subject: ... [Cuerpo del mensaje]', title: '10. Transferencia de Datos', text: 'El cliente envía las cabeceras (From, To, Subject) y el cuerpo del mensaje, finalizando con la secuencia <CRLF>.<CRLF>.' },
+                { type: 'server', command: '250 2.0.0 OK: Queued as 12345', title: '11. Confirmación de Recepción', text: 'El servidor confirma que ha recibido el mensaje completo y lo ha puesto en cola para su entrega. La transacción ha sido exitosa.' },
+                { type: 'client', command: 'QUIT', title: '12. Cierre de Sesión (QUIT)', text: 'El cliente indica que ha terminado y desea cerrar la conexión.' },
+                { type: 'server', command: '221 2.0.0 Bye', title: '13. Despedida del Servidor', text: 'El servidor se despide y cierra la conexión TCP.' },
+            ];
+            
+            const clientCommandsDiv = document.getElementById('client-commands');
+            const serverResponsesDiv = document.getElementById('server-responses');
+            const explanationBox = document.getElementById('explanation-box');
+            const explanationTitle = document.getElementById('explanation-title');
+            const explanationText = document.getElementById('explanation-text');
+
+            sessionSteps.forEach((step, index) => {
+                const stepDiv = document.createElement('div');
+                stepDiv.className = 'p-3 rounded-md cursor-pointer transition-all duration-200';
+                stepDiv.textContent = step.command;
+                stepDiv.dataset.index = index;
+
+                if (step.type === 'client') {
+                    stepDiv.classList.add('bg-blue-100', 'text-blue-800', 'border', 'border-blue-200', 'hover:bg-blue-200', 'hover:shadow-md');
+                    clientCommandsDiv.appendChild(stepDiv);
+                } else {
+                    stepDiv.classList.add('bg-green-100', 'text-green-800', 'border', 'border-green-200', 'hover:bg-green-200', 'hover:shadow-md');
+                    serverResponsesDiv.appendChild(stepDiv);
+                }
+
+                stepDiv.addEventListener('click', () => {
+                    explanationTitle.textContent = step.title;
+                    explanationText.textContent = step.text;
+                    explanationBox.classList.remove('opacity-0');
+                    explanationBox.classList.add('opacity-100');
+
+                    document.querySelectorAll('#client-commands > div, #server-responses > div').forEach(d => {
+                        d.classList.remove('ring-2', 'ring-offset-2', 'ring-indigo-500');
+                    });
+                    stepDiv.classList.add('ring-2', 'ring-offset-2', 'ring-indigo-500');
+                });
+            });
+
+            // Lógica para la sección de Evolución
+            const timelineEvents = [
+                { year: 1982, rfc: 'RFC 821', title: 'Nacimiento de SMTP', text: 'Jonathan Postel estandariza SMTP. Diseñado para un entorno de alta confianza (ARPANET), se centra en la fiabilidad sobre la seguridad. Introduce el relaying.' },
+                { year: 1995, rfc: 'RFC 1869', title: 'Llega Extended SMTP (ESMTP)', text: 'Introduce el comando EHLO, permitiendo añadir extensiones como AUTH y STARTTLS sin romper la compatibilidad con servidores antiguos. Es la respuesta a la explosión comercial de Internet.' },
+                { year: 2001, rfc: 'RFC 2821', title: 'Primera Gran Consolidación', text: 'Obsoleta al RFC 821 y consolida las extensiones ESMTP más importantes en un único estándar actualizado, clarificando ambigüedades.' },
+                { year: 2002, rfc: 'RFC 3207', title: 'Cifrado con STARTTLS', text: 'Estandariza la extensión STARTTLS, que permite elevar una conexión de texto plano a una cifrada con TLS, protegiendo los datos en tránsito.' },
+                { year: 2008, rfc: 'RFC 5321', title: 'El Estándar Actual', text: 'Obsoleta al RFC 2821 y se convierte en el estándar de facto. Refina las especificaciones e incorpora las mejores prácticas para la Internet moderna.' },
+                { year: 2011, rfc: 'RFC 6376', title: 'Autenticación con DKIM', text: 'Define DomainKeys Identified Mail, un método de firma criptográfica para verificar la integridad del mensaje y la autoridad del dominio firmante.' },
+                { year: 2014, rfc: 'RFC 7208', title: 'Autorización con SPF', text: 'Define Sender Policy Framework, un mecanismo para que un dominio declare qué IPs están autorizadas a enviar correo en su nombre, validando el sobre SMTP.' },
+                { year: 2015, rfc: 'RFC 7489', title: 'Política y Reportes con DMARC', text: 'Define DMARC, que unifica SPF y DKIM, requiere alineación con la cabecera "From:" y proporciona políticas de acción y reportes de abuso.' },
+            ];
+
+            const timelineContainer = document.getElementById('timeline-container');
+            timelineEvents.forEach(event => {
+                const item = document.createElement('div');
+                item.className = 'timeline-item';
+                item.innerHTML = `
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-stone-200 ml-4">
+                        <p class="text-sm font-semibold text-blue-600">${event.year} - ${event.rfc}</p>
+                        <h4 class="font-bold text-lg mt-1">${event.title}</h4>
+                        <p class="mt-2 text-stone-600">${event.text}</p>
+                    </div>
+                `;
+                timelineContainer.appendChild(item);
+            });
+
+            // Lógica para el gráfico de Seguridad
+            const ctx = document.getElementById('securityProtocolsChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: [
+                            'Valida Sobre (MAIL FROM)',
+                            'Valida Cabecera (From:)',
+                            'Protege Contenido',
+                            'Resiste Reenvío',
+                            'Define Política de Acción',
+                            'Genera Reportes'
+                        ],
+                        datasets: [{
+                            label: 'SPF',
+                            data: [9, 2, 0, 1, 1, 0],
+                            fill: true,
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgb(255, 99, 132)',
+                            pointBackgroundColor: 'rgb(255, 99, 132)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgb(255, 99, 132)'
+                        }, {
+                            label: 'DKIM',
+                            data: [2, 8, 9, 9, 2, 0],
+                            fill: true,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgb(54, 162, 235)',
+                            pointBackgroundColor: 'rgb(54, 162, 235)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgb(54, 162, 235)'
+                        }, {
+                            label: 'DMARC',
+                            data: [8, 10, 2, 9, 10, 10],
+                            fill: true,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgb(75, 192, 192)',
+                            pointBackgroundColor: 'rgb(75, 192, 192)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgb(75, 192, 192)'
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                angleLines: {
+                                    color: 'rgba(0, 0, 0, 0.1)'
+                                },
+                                suggestedMin: 0,
+                                suggestedMax: 10,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.1)'
+                                },
+                                pointLabels: {
+                                    font: {
+                                        size: 12
+                                    },
+                                    color: '#292524'
+                                },
+                                ticks: {
+                                    backdropColor: 'rgba(255, 255, 255, 0.75)',
+                                    stepSize: 2
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        label += context.raw;
+                                        return label + '/10';
+                                    }
+                                }
+                            },
+                            legend: {
+                                position: 'top',
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
