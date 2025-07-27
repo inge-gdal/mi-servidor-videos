@@ -3,460 +3,485 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Explorador Interactivo de SMTP</title>
+    <title>Análisis Interactivo: Proyecto Agua Potable Cono Sur, Arequipa (CUI 2479971)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Calm Neutral Tech -->
-    <!-- Application Structure Plan: La aplicación está diseñada con una estructura temática no lineal para facilitar el aprendizaje y la exploración. En lugar de seguir el orden del informe académico, se divide en cinco secciones principales accesibles a través de una barra de navegación fija: "Fundamentos", "Mecánica de la Sesión", "Evolución Histórica", "Seguridad" y "Ecosistema Completo". Esta arquitectura permite a los usuarios saltar directamente al tema de su interés. Se utilizan elementos interactivos clave como un diagrama de sesión SMTP paso a paso y una línea de tiempo de RFCs para visualizar procesos complejos, y un gráfico de radar para comparar tecnologías de seguridad, transformando el texto denso en una experiencia de aprendizaje atractiva y digerible. -->
+    <!-- Chosen Palette: Warm Neutrals & Strategic Accents -->
+    <!-- Application Structure Plan: Se ha diseñado una SPA tipo dashboard con navegación superior fija para un acceso no lineal. La estructura se centra en el "dilema" del proyecto (Promesa vs. Riesgo) como punto de partida. Las secciones subsiguientes (Solución Técnica, Riesgo Institucional, Impacto Social, Análisis y Futuro) permiten al usuario profundizar en los aspectos que más le interesen. Esta arquitectura prioriza la comprensión rápida del conflicto central y la exploración guiada de los detalles, en lugar de seguir la estructura secuencial del informe, mejorando la usabilidad y la retención de la información clave. -->
     <!-- Visualization & Content Choices: 
-        - Agentes del Correo (MUA/MSA/MTA): (Objetivo: Informar, Método: Tarjetas HTML/CSS interactivas, Justificación: Presenta los componentes clave del ecosistema de forma clara y separada).
-        - Sobre vs. Contenido: (Objetivo: Informar/Comparar, Método: Diagrama visual con HTML/CSS, Justificación: Ilustra una vulnerabilidad fundamental de forma mucho más clara que el texto solo).
-        - Sesión SMTP: (Objetivo: Organizar/Mostrar Cambio, Método: Diagrama de flujo interactivo con HTML/CSS+JS, Justificación: Demuestra el diálogo secuencial del protocolo, permitiendo al usuario explorar cada paso a su propio ritmo).
-        - Evolución de RFCs: (Objetivo: Mostrar Cambio, Método: Línea de tiempo vertical interactiva con HTML/CSS+JS, Justificación: Visualiza la progresión histórica de los estándares de una manera intuitiva).
-        - SPF vs. DKIM vs. DMARC: (Objetivo: Comparar, Método: Gráfico de radar con Chart.js/Canvas, Justificación: Permite una comparación visual y multidimensional de las fortalezas y debilidades de cada protocolo de autenticación).
-        - SMTP vs. POP3 vs. IMAP: (Objetivo: Comparar, Método: Tabla comparativa HTML/CSS interactiva, Justificación: Ofrece una referencia rápida y clara de las funciones de cada protocolo en el ecosistema del correo).
-    -->
+        - Portafolio SEDAPAR (Gráfico de Barras Horizontales, Chart.js): Objetivo: Demostrar el riesgo sistémico. El gráfico muestra visualmente la alta proporción de proyectos no ejecutados, justificando la preocupación por la capacidad de gestión. Interacción: Tooltips con cifras exactas.
+        - Cobertura de Agua (Gráfico de Anillo, Chart.js): Objetivo: Cuantificar el impacto social. Compara el "antes" y el "después" de forma clara y directa. Interacción: Tooltips.
+        - Diagrama de Flujo del Sistema (HTML/CSS): Objetivo: Explicar la solución técnica de forma sencilla. Se evita la complejidad de un plano de ingeniería, enfocándose en los componentes clave. Interacción: Hover para mostrar descripciones.
+        - Hallazgos de Control (Lista Interactiva, JS): Objetivo: Organizar y presentar las 13 irregularidades de forma digerible. Un listado largo sería abrumador; una lista colapsable permite al usuario explorar a su propio ritmo. Interacción: Clic para expandir/colapsar.
+        - Análisis FODA (Grid HTML/CSS): Objetivo: Sintetizar el análisis estratégico. Un grid de 4 cuadrantes es el formato estándar y más intuitivo para este tipo de análisis.
+        Justificación: Las elecciones buscan traducir datos y texto denso en visualizaciones claras y acciones interactivas que fomenten la exploración y la comprensión, usando Chart.js para datos cuantitativos y HTML/CSS/JS para información cualitativa y estructural. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f5f5f4; /* stone-100 */
-            color: #292524; /* stone-800 */
-        }
-        .nav-link {
-            transition: all 0.2s ease-in-out;
-            border-bottom: 2px solid transparent;
-        }
-        .nav-link.active, .nav-link:hover {
-            border-bottom-color: #2563eb; /* blue-600 */
-            color: #1e40af; /* blue-800 */
-        }
-        .content-section {
-            display: none;
-        }
-        .content-section.active {
-            display: block;
-        }
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            width: 1rem;
-            height: 1rem;
-            border-radius: 50%;
-            background-color: white;
-            border: 3px solid #60a5fa; /* blue-400 */
-            left: -0.5rem;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 1;
-        }
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 300px;
-            max-height: 400px;
-        }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 400px;
-            }
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #F8F9FA; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 350px; max-height: 400px; }
+        @media (max-width: 768px) { .chart-container { height: 300px; max-height: 350px; } }
+        .nav-link { transition: color 0.3s, border-bottom-color 0.3s; }
+        .card { transition: transform 0.3s, box-shadow 0.3s; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-in-out; }
     </style>
 </head>
-<body class="antialiased">
+<body class="bg-gray-50 text-gray-800">
 
     <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
-                <h1 class="text-2xl font-bold text-stone-900">Explorador Interactivo de SMTP</h1>
-                <nav class="hidden md:flex space-x-6">
-                    <a href="#fundamentos" class="nav-link text-stone-600 font-medium pb-1">Fundamentos</a>
-                    <a href="#mecanica" class="nav-link text-stone-600 font-medium pb-1">Mecánica</a>
-                    <a href="#evolucion" class="nav-link text-stone-600 font-medium pb-1">Evolución</a>
-                    <a href="#seguridad" class="nav-link text-stone-600 font-medium pb-1">Seguridad</a>
-                    <a href="#ecosistema" class="nav-link text-stone-600 font-medium pb-1">Ecosistema</a>
-                </nav>
+        <nav class="container mx-auto px-4 lg:px-6 py-3">
+            <div class="flex justify-between items-center">
+                <a href="#" class="text-xl font-bold text-blue-800">Proyecto Agua Cono Sur</a>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#dilema" class="nav-link text-gray-600 hover:text-blue-700 border-b-2 border-transparent hover:border-blue-700 pb-1">El Dilema</a>
+                    <a href="#solucion" class="nav-link text-gray-600 hover:text-blue-700 border-b-2 border-transparent hover:border-blue-700 pb-1">Solución Técnica</a>
+                    <a href="#riesgo" class="nav-link text-gray-600 hover:text-blue-700 border-b-2 border-transparent hover:border-blue-700 pb-1">Riesgo Institucional</a>
+                    <a href="#impacto" class="nav-link text-gray-600 hover:text-blue-700 border-b-2 border-transparent hover:border-blue-700 pb-1">Impacto Social</a>
+                    <a href="#analisis" class="nav-link text-gray-600 hover:text-blue-700 border-b-2 border-transparent hover:border-blue-700 pb-1">Análisis y Futuro</a>
+                </div>
+                <button id="mobile-menu-button" class="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100">
+                    <span class="block w-6 h-0.5 bg-current"></span>
+                    <span class="block w-6 h-0.5 bg-current mt-1.5"></span>
+                    <span class="block w-6 h-0.5 bg-current mt-1.5"></span>
+                </button>
             </div>
-        </div>
+            <div id="mobile-menu" class="hidden md:hidden mt-4 space-y-2">
+                <a href="#dilema" class="block py-2 px-3 rounded-md text-gray-600 hover:bg-blue-50 hover:text-blue-700">El Dilema</a>
+                <a href="#solucion" class="block py-2 px-3 rounded-md text-gray-600 hover:bg-blue-50 hover:text-blue-700">Solución Técnica</a>
+                <a href="#riesgo" class="block py-2 px-3 rounded-md text-gray-600 hover:bg-blue-50 hover:text-blue-700">Riesgo Institucional</a>
+                <a href="#impacto" class="block py-2 px-3 rounded-md text-gray-600 hover:bg-blue-50 hover:text-blue-700">Impacto Social</a>
+                <a href="#analisis" class="block py-2 px-3 rounded-md text-gray-600 hover:bg-blue-50 hover:text-blue-700">Análisis y Futuro</a>
+            </div>
+        </nav>
     </header>
 
-    <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+    <main class="container mx-auto px-4 lg:px-6 py-8 md:py-12">
         
-        <!-- Sección 1: Fundamentos -->
-        <section id="fundamentos" class="content-section space-y-12">
-            <div class="text-center">
-                <h2 class="text-3xl font-bold text-stone-900">Fundamentos de SMTP</h2>
-                <p class="mt-2 text-lg text-stone-600 max-w-3xl mx-auto">El Protocolo Simple de Transferencia de Correo es la columna vertebral del email. Descubre sus componentes clave y conceptos esenciales.</p>
+        <section id="hero" class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Agua para el Cono Sur de Arequipa</h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-8">Un análisis interactivo del proyecto CUI 2479971: una solución técnica robusta frente a un severo riesgo institucional.</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-blue-500">
+                    <p class="text-sm text-gray-500">Beneficiarios</p>
+                    <p class="text-2xl font-bold text-gray-800">~170,000</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-green-500">
+                    <p class="text-sm text-gray-500">Inversión (Adjudicada)</p>
+                    <p class="text-2xl font-bold text-gray-800">S/ 71.7 M</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-yellow-500">
+                    <p class="text-sm text-gray-500">Longitud Tubería</p>
+                    <p class="text-2xl font-bold text-gray-800">20.7 km</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-md border-l-4 border-red-500">
+                    <p class="text-sm text-gray-500">Hallazgos Críticos</p>
+                    <p class="text-2xl font-bold text-gray-800">13</p>
+                </div>
             </div>
+        </section>
 
-            <div>
-                <h3 class="text-2xl font-semibold mb-4 text-stone-800">Los Agentes del Correo Electrónico</h3>
-                <p class="mb-6 text-stone-600">El envío de un correo electrónico involucra a varios actores de software que trabajan en conjunto. Cada uno tiene un rol específico en el viaje del mensaje desde el remitente hasta el destinatario.</p>
+        <section id="dilema" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-2 text-gray-900">El Dilema del Proyecto</h2>
+            <p class="text-lg text-center text-gray-600 mb-10 max-w-3xl mx-auto">El proyecto existe en una dualidad: una justificación social y técnica innegable contra una capacidad de gestión que genera serias dudas. Aquí exploramos esta tensión fundamental.</p>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-green-50 border-2 border-green-200 p-6 rounded-lg">
+                    <h3 class="text-2xl font-bold text-green-800 mb-4 flex items-center"><span class="text-3xl mr-3">💧</span>La Promesa: Viabilidad y Necesidad</h3>
+                    <p class="text-green-700 mb-4">El diseño técnico es sólido y responde a una crisis hídrica histórica. La solución propuesta es duradera, usa tecnología de punta y tiene el potencial de transformar la vida de miles de personas.</p>
+                    <ul class="space-y-3 text-green-900">
+                        <li class="flex items-start"><span class="font-bold text-green-600 mr-2">✔</span> <strong>Diseño Robusto:</strong> Tubería de hierro dúctil para más de 100 años de vida útil.</li>
+                        <li class="flex items-start"><span class="font-bold text-green-600 mr-2">✔</span> <strong>Fuente Fiable:</strong> Abastecimiento garantizado por la moderna PTAP N°2 La Tomilla.</li>
+                        <li class="flex items-start"><span class="font-bold text-green-600 mr-2">✔</span> <strong>Necesidad Crítica:</strong> Resuelve décadas de déficit hídrico y emergencias sanitarias.</li>
+                        <li class="flex items-start"><span class="font-bold text-green-600 mr-2">✔</span> <strong>Alto Impacto Social:</strong> Mejora directa en salud, economía y equidad para 170,000 personas.</li>
+                    </ul>
+                </div>
+                <div class="bg-red-50 border-2 border-red-200 p-6 rounded-lg">
+                    <h3 class="text-2xl font-bold text-red-800 mb-4 flex items-center"><span class="text-3xl mr-3">⚠️</span>El Riesgo: Gestión y Gobernanza</h3>
+                    <p class="text-red-700 mb-4">La entidad ejecutora, SEDAPAR S.A., presenta un historial de deficiencias sistémicas documentadas por órganos de control, amenazando la correcta ejecución del proyecto.</p>
+                    <ul class="space-y-3 text-red-900">
+                        <li class="flex items-start"><span class="font-bold text-red-600 mr-2">✖</span> <strong>Ejecución Deficiente:</strong> Historial de proyectos paralizados o no ejecutados.</li>
+                        <li class="flex items-start"><span class="font-bold text-red-600 mr-2">✖</span> <strong>Hallazgos de Control:</strong> 13 irregularidades graves detectadas por la Contraloría solo en este proyecto.</li>
+                        <li class="flex items-start"><span class="font-bold text-red-600 mr-2">✖</span> <strong>Fallas de Calidad:</strong> Problemas en la construcción del reservorio y retrasos en compra de materiales.</li>
+                        <li class="flex items-start"><span class="font-bold text-red-600 mr-2">✖</span> <strong>Conflictos Sociales:</strong> Incapacidad para gestionar la oposición de la comunidad.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="solucion" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-2 text-gray-900">La Solución Técnica Propuesta</h2>
+            <p class="text-lg text-center text-gray-600 mb-10 max-w-3xl mx-auto">El proyecto se basa en una ingeniería sólida, diseñada para la durabilidad y eficiencia. A continuación, se detallan sus componentes clave, desde la fuente de agua hasta su distribución.</p>
+            <div class="bg-white p-6 md:p-8 rounded-lg shadow-lg">
+                <div class="grid md:grid-cols-3 gap-8 mb-8">
+                    <div class="card p-4 border rounded-lg text-center">
+                        <div class="text-4xl mb-2">🏭</div>
+                        <h4 class="font-bold text-lg">Fuente: PTAP N°2</h4>
+                        <p class="text-sm text-gray-600">La moderna Planta de Tratamiento La Tomilla II, con capacidad de hasta 1,500 l/s, garantiza el suministro.</p>
+                    </div>
+                    <div class="card p-4 border rounded-lg text-center">
+                        <div class="text-4xl mb-2">🔩</div>
+                        <h4 class="font-bold text-lg">Material: Hierro Dúctil</h4>
+                        <p class="text-sm text-gray-600">Tubería de alta resistencia a la corrosión y presión, con una vida útil estimada de más de 100 años.</p>
+                    </div>
+                    <div class="card p-4 border rounded-lg text-center">
+                        <div class="text-4xl mb-2">🏞️</div>
+                        <h4 class="font-bold text-lg">Componentes Clave</h4>
+                        <p class="text-sm text-gray-600">Incluye un nuevo reservorio, sifones, cámaras de derivación y válvulas para un sistema integrado.</p>
+                    </div>
+                </div>
+                <h4 class="text-xl font-semibold text-center mb-4 text-gray-800">Diagrama Simplificado del Sistema</h4>
+                <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 text-center">
+                    <div class="component-node p-3 bg-blue-100 rounded-lg w-40">
+                        <p class="font-semibold">PTAP La Tomilla II</p>
+                        <p class="text-xs text-blue-800">Fuente de Agua</p>
+                    </div>
+                    <div class="text-2xl font-mono text-blue-400">➡️</div>
+                    <div class="component-node p-3 bg-gray-200 rounded-lg w-48">
+                        <p class="font-semibold">Línea de Conducción</p>
+                        <p class="text-xs text-gray-700">20.7 km Hierro Dúctil</p>
+                    </div>
+                    <div class="text-2xl font-mono text-gray-400">➡️</div>
+                    <div class="component-node p-3 bg-teal-100 rounded-lg w-40">
+                        <p class="font-semibold">Reservorio</p>
+                        <p class="text-xs text-teal-800">Almacenamiento</p>
+                    </div>
+                    <div class="text-2xl font-mono text-teal-400">➡️</div>
+                    <div class="component-node p-3 bg-green-100 rounded-lg w-48">
+                        <p class="font-semibold">Red de Distribución</p>
+                        <p class="text-xs text-green-800">Socabaya, Sabandía, Characato</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="riesgo" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-2 text-gray-900">Riesgo Institucional: La Amenaza de SEDAPAR</h2>
+            <p class="text-lg text-center text-gray-600 mb-10 max-w-3xl mx-auto">La capacidad de gestión de SEDAPAR es el talón de Aquiles del proyecto. Los hallazgos de la Contraloría y SUNASS, junto a su historial de ejecución, pintan un panorama preocupante.</p>
+            <div class="grid lg:grid-cols-5 gap-8">
+                <div class="lg:col-span-3 bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-xl font-bold mb-4 text-gray-800">Portafolio de Proyectos de SEDAPAR (INFOBRAS)</h3>
+                    <p class="text-sm text-gray-600 mb-4">Un análisis de los 170 proyectos registrados a nombre de SEDAPAR revela una alarmante tasa de obras sin ejecución, evidenciando una debilidad institucional crónica para llevar los proyectos a término.</p>
+                    <div class="chart-container h-96">
+                        <canvas id="sedaparProjectsChart"></canvas>
+                    </div>
+                </div>
+                <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-xl font-bold mb-4 text-red-700">13 Hallazgos Críticos de la Contraloría</h3>
+                    <p class="text-sm text-gray-600 mb-4">El órgano de control ha identificado múltiples situaciones adversas que ponen en riesgo la calidad, costo y plazo de la obra. Haga clic para ver detalles.</p>
+                    <div id="accordion" class="space-y-2">
+                        <div class="accordion-item border rounded-md">
+                            <button class="accordion-header w-full text-left p-3 bg-gray-100 hover:bg-gray-200 font-semibold flex justify-between items-center">
+                                <span>1. Desfase en Ejecución</span>
+                                <span class="text-xl font-light">+</span>
+                            </button>
+                            <div class="accordion-content px-3 pb-3 text-sm text-gray-700">
+                                <p>El avance de las partidas presupuestarias no se alinea con el cronograma, anticipando retrasos.</p>
+                            </div>
+                        </div>
+                        <div class="accordion-item border rounded-md">
+                            <button class="accordion-header w-full text-left p-3 bg-gray-100 hover:bg-gray-200 font-semibold flex justify-between items-center">
+                                <span>2. Retraso en Compra de Tuberías</span>
+                                <span class="text-xl font-light">+</span>
+                            </button>
+                            <div class="accordion-content px-3 pb-3 text-sm text-gray-700">
+                                <p>Demora crítica en la adquisición del material principal (hierro dúctil), paralizando frentes de trabajo.</p>
+                            </div>
+                        </div>
+                        <div class="accordion-item border rounded-md">
+                            <button class="accordion-header w-full text-left p-3 bg-gray-100 hover:bg-gray-200 font-semibold flex justify-between items-center">
+                                <span>3. Fallas Calidad de Concreto</span>
+                                <span class="text-xl font-light">+</span>
+                            </button>
+                            <div class="accordion-content px-3 pb-3 text-sm text-gray-700">
+                                <p>Pruebas de calidad del concreto del reservorio no alcanzaron la resistencia exigida, comprometiendo su estructura.</p>
+                            </div>
+                        </div>
+                         <div class="accordion-item border rounded-md">
+                            <button class="accordion-header w-full text-left p-3 bg-gray-100 hover:bg-gray-200 font-semibold flex justify-between items-center">
+                                <span>4. Irregularidades en Adjudicación</span>
+                                <span class="text-xl font-light">+</span>
+                            </button>
+                            <div class="accordion-content px-3 pb-3 text-sm text-gray-700">
+                                <p>Se habría favorecido a un postor con una oferta S/ 8M por debajo del valor referencial, arriesgando la calidad y culminación de la obra.</p>
+                            </div>
+                        </div>
+                        <div class="accordion-item border rounded-md">
+                            <button class="accordion-header w-full text-left p-3 bg-gray-100 hover:bg-gray-200 font-semibold flex justify-between items-center">
+                                <span>5. Supervisión Deficiente</span>
+                                <span class="text-xl font-light">+</span>
+                            </button>
+                            <div class="accordion-content px-3 pb-3 text-sm text-gray-700">
+                                <p>Mala gestión en la contratación de la empresa supervisora, con riesgo de que no cumpla la experiencia requerida.</p>
+                            </div>
+                        </div>
+                        <div class="accordion-item border rounded-md">
+                            <button class="accordion-header w-full text-left p-3 bg-gray-100 hover:bg-gray-200 font-semibold flex justify-between items-center">
+                                <span>6 a 13. Otros Riesgos</span>
+                                <span class="text-xl font-light">+</span>
+                            </button>
+                            <div class="accordion-content px-3 pb-3 text-sm text-gray-700">
+                                <p>Incluyen conflictos sociales no resueltos, falta de transparencia (sanciones de SUNASS), y problemas de facturación a usuarios.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="impacto" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-2 text-gray-900">Impacto Social: Transformando Vidas</h2>
+            <p class="text-lg text-center text-gray-600 mb-10 max-w-3xl mx-auto">Si el proyecto supera sus riesgos, el impacto en la calidad de vida de los casi 170,000 beneficiarios será inmenso, cerrando brechas históricas en salud, economía y equidad.</p>
+            <div class="grid lg:grid-cols-2 gap-8 items-center">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-xl font-bold mb-4 text-gray-800">Mejora en Cobertura y Continuidad (Ej. Socabaya)</h3>
+                    <p class="text-sm text-gray-600 mb-4">El proyecto busca elevar la cobertura de la red pública de un deficiente 75% a un estándar cercano a la universalidad, y garantizar un servicio continuo 24/7, eliminando los cortes.</p>
+                    <div class="chart-container h-72">
+                        <canvas id="coverageChart"></canvas>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div class="card bg-white p-6 rounded-lg shadow">
+                        <h4 class="font-bold text-lg text-blue-700 mb-2">Salud Pública</h4>
+                        <p class="text-gray-600">Reducción drástica de enfermedades de origen hídrico al eliminar la dependencia de fuentes de agua no seguras como pozos o camiones cisterna.</p>
+                    </div>
+                    <div class="card bg-white p-6 rounded-lg shadow">
+                        <h4 class="font-bold text-lg text-green-700 mb-2">Desarrollo Económico</h4>
+                        <p class="text-gray-600">Ahorro para las familias al no tener que comprar agua a precios elevados. Habilita el comercio local y revitaliza la agricultura afectada por la escasez.</p>
+                    </div>
+                    <div class="card bg-white p-6 rounded-lg shadow">
+                        <h4 class="font-bold text-lg text-purple-700 mb-2">Equidad de Género</h4>
+                        <p class="text-gray-600">Libera a mujeres y niñas de la carga de tiempo que supone acarrear agua, permitiéndoles dedicarlo a la educación o actividades productivas.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="analisis" class="scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-2 text-gray-900">Análisis Estratégico y Futuro</h2>
+            <p class="text-lg text-center text-gray-600 mb-10 max-w-3xl mx-auto">Sintetizando los hallazgos, se presenta un análisis FODA y las recomendaciones clave para mitigar los riesgos y asegurar que esta inversión crucial llegue a buen puerto.</p>
+            <div class="bg-white p-6 md:p-8 rounded-lg shadow-lg">
+                <h3 class="text-2xl font-bold text-center mb-6 text-gray-800">Análisis FODA del Proyecto</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-green-100 p-4 rounded-lg">
+                        <h4 class="font-bold text-green-800">Fortalezas</h4>
+                        <ul class="list-disc list-inside text-sm text-green-700 mt-2"><li>Necesidad social urgente</li><li>Diseño técnico robusto</li><li>Fuente de agua fiable</li></ul>
+                    </div>
+                    <div class="bg-yellow-100 p-4 rounded-lg">
+                        <h4 class="font-bold text-yellow-800">Oportunidades</h4>
+                        <ul class="list-disc list-inside text-sm text-yellow-700 mt-2"><li>Impacto transformador en calidad de vida</li><li>Catalizador para reforma de SEDAPAR</li><li>Modelo de buenas prácticas a futuro</li></ul>
+                    </div>
+                    <div class="bg-red-100 p-4 rounded-lg">
+                        <h4 class="font-bold text-red-800">Debilidades</h4>
+                        <ul class="list-disc list-inside text-sm text-red-700 mt-2"><li>Capacidad institucional crítica (SEDAPAR)</li><li>Gobernanza y controles fallidos</li><li>Gestión de conflictos ineficaz</li></ul>
+                    </div>
+                    <div class="bg-orange-100 p-4 rounded-lg">
+                        <h4 class="font-bold text-orange-800">Amenazas</h4>
+                        <ul class="list-disc list-inside text-sm text-orange-700 mt-2"><li>Fracaso total o parcial del proyecto</li><li>Escalada de conflictos sociales</li><li>Pérdida de confianza pública</li></ul>
+                    </div>
+                </div>
+
+                <hr class="my-8">
+
+                <h3 class="text-2xl font-bold text-center mb-6 text-gray-800">Recomendaciones Estratégicas</h3>
                 <div class="grid md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-lg shadow-md border border-stone-200">
-                        <h4 class="font-bold text-lg text-blue-700">MUA (Mail User Agent)</h4>
-                        <p class="mt-2 text-stone-600">Es la aplicación que usas: Outlook, Gmail, Apple Mail. Te permite leer, escribir y gestionar tus correos. Es el punto de inicio y fin para el usuario.</p>
+                    <div>
+                        <h4 class="font-semibold text-lg text-center mb-3">Para SEDAPAR S.A.</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li class="bg-gray-100 p-3 rounded">Crear una PMO independiente para el proyecto.</li>
+                            <li class="bg-gray-100 p-3 rounded">Implementar un plan profesional de gestión social.</li>
+                            <li class="bg-gray-100 p-3 rounded">Someterse a una auditoría de gestión externa.</li>
+                        </ul>
                     </div>
-                    <div class="bg-white p-6 rounded-lg shadow-md border border-stone-200">
-                        <h4 class="font-bold text-lg text-blue-700">MSA (Mail Submission Agent)</h4>
-                        <p class="mt-2 text-stone-600">El primer servidor que recibe tu correo desde el MUA. Su trabajo es autenticarte y pasar el mensaje al MTA para su envío. Opera típicamente en el puerto 587.</p>
+                    <div>
+                        <h4 class="font-semibold text-lg text-center mb-3">Para Órganos de Control</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li class="bg-gray-100 p-3 rounded">Intensificar el control concurrente (mensual).</li>
+                            <li class="bg-gray-100 p-3 rounded">Designar un "veedor técnico" con poder de visado.</li>
+                            <li class="bg-gray-100 p-3 rounded">Crear un tablero de control público del proyecto.</li>
+                        </ul>
                     </div>
-                    <div class="bg-white p-6 rounded-lg shadow-md border border-stone-200">
-                        <h4 class="font-bold text-lg text-blue-700">MTA (Mail Transfer Agent)</h4>
-                        <p class="mt-2 text-stone-600">El "cartero" de Internet. Es el software que usa SMTP para retransmitir el correo de un servidor a otro hasta llegar al destino final. Actúa como cliente y servidor SMTP.</p>
+                    <div>
+                        <h4 class="font-semibold text-lg text-center mb-3">Para Gobierno y Financistas</h4>
+                        <ul class="space-y-2 text-sm">
+                            <li class="bg-gray-100 p-3 rounded">Condicionar desembolsos a hitos de gobernanza.</li>
+                            <li class="bg-gray-100 p-3 rounded">Financiar asistencia técnica "incrustada".</li>
+                            <li class="bg-gray-100 p-3 rounded">Evaluar modelos alternativos (APP, OxI) a futuro.</li>
+                        </ul>
                     </div>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="text-2xl font-semibold mb-4 text-stone-800">El Sobre vs. El Contenido: La Vulnerabilidad Original</h3>
-                <p class="mb-6 text-stone-600">Una de las características más importantes y problemáticas de SMTP es la separación entre la información de transporte (el sobre) y el mensaje visible (el contenido). Esta dualidad es la raíz del 'spoofing' o suplantación de identidad.</p>
-                <div class="grid md:grid-cols-2 gap-8 items-start">
-                    <div class="bg-white p-6 rounded-lg shadow-md border border-stone-200">
-                        <h4 class="font-bold text-lg text-center mb-4">✉️ El Sobre SMTP (RFC 5321)</h4>
-                        <p class="text-sm text-stone-500 text-center mb-4">Usado por los servidores para enrutar el correo. Invisible para el usuario final.</p>
-                        <div class="font-mono text-sm space-y-2 bg-stone-100 p-4 rounded">
-                            <p><span class="text-purple-600 font-semibold">MAIL FROM:</span>&lt;atacante@phishing.com&gt;</p>
-                            <p><span class="text-purple-600 font-semibold">RCPT TO:</span>&lt;victima@empresa.com&gt;</p>
-                        </div>
-                        <p class="mt-4 text-stone-600">El servidor usa estas direcciones para la entrega real y para los informes de error (rebotes).</p>
-                    </div>
-                    <div class="bg-white p-6 rounded-lg shadow-md border border-stone-200">
-                        <h4 class="font-bold text-lg text-center mb-4">📄 El Contenido del Mensaje (RFC 5322)</h4>
-                        <p class="text-sm text-stone-500 text-center mb-4">Es lo que ves en tu cliente de correo.</p>
-                        <div class="font-mono text-sm space-y-2 bg-stone-100 p-4 rounded">
-                            <p><span class="text-green-600 font-semibold">From:</span> "CEO" &lt;ceo@empresa.com&gt;</p>
-                            <p><span class="text-green-600 font-semibold">To:</span> &lt;victima@empresa.com&gt;</p>
-                            <p><span class="text-green-600 font-semibold">Subject:</span> ¡Acción Urgente Requerida!</p>
-                        </div>
-                        <p class="mt-4 text-stone-600">El protocolo original no exigía que el `From:` de la cabecera coincidiera con el `MAIL FROM` del sobre, permitiendo la suplantación.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección 2: Mecánica -->
-        <section id="mecanica" class="content-section">
-            <div class="text-center">
-                <h2 class="text-3xl font-bold text-stone-900">Mecánica de la Sesión SMTP</h2>
-                <p class="mt-2 text-lg text-stone-600 max-w-3xl mx-auto">Explora el diálogo paso a paso entre un cliente y un servidor para enviar un correo. Haz clic en cada paso para ver los detalles.</p>
-            </div>
-            <div class="mt-12 max-w-4xl mx-auto">
-                <div class="flex flex-col md:flex-row justify-between gap-8">
-                    <div class="w-full md:w-1/2 text-center">
-                        <h3 class="text-xl font-semibold mb-4">Cliente SMTP</h3>
-                        <div id="client-commands" class="space-y-4"></div>
-                    </div>
-                    <div class="w-full md:w-1/2 text-center">
-                        <h3 class="text-xl font-semibold mb-4">Servidor SMTP</h3>
-                        <div id="server-responses" class="space-y-4"></div>
-                    </div>
-                </div>
-                <div id="explanation-box" class="mt-8 bg-white p-6 rounded-lg shadow-lg border border-blue-200 transition-all duration-300 opacity-0">
-                    <h4 id="explanation-title" class="font-bold text-lg text-blue-800"></h4>
-                    <p id="explanation-text" class="mt-2 text-stone-600"></p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección 3: Evolución -->
-        <section id="evolucion" class="content-section">
-            <div class="text-center">
-                <h2 class="text-3xl font-bold text-stone-900">Evolución Histórica de SMTP</h2>
-                <p class="mt-2 text-lg text-stone-600 max-w-3xl mx-auto">Desde un protocolo basado en la confianza hasta un estándar endurecido. Un viaje a través de los RFCs (Request for Comments) que definieron el correo moderno.</p>
-            </div>
-            <div class="mt-12 max-w-3xl mx-auto">
-                <div id="timeline-container" class="relative border-l-2 border-blue-200 pl-8 space-y-12">
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección 4: Seguridad -->
-        <section id="seguridad" class="content-section">
-            <div class="text-center">
-                <h2 class="text-3xl font-bold text-stone-900">El Imperativo de la Seguridad</h2>
-                <p class="mt-2 text-lg text-stone-600 max-w-3xl mx-auto">La simplicidad original de SMTP dio lugar a vulnerabilidades. Explora las amenazas y las capas de defensa construidas para proteger el correo electrónico.</p>
-            </div>
-            <div class="mt-12">
-                <h3 class="text-2xl font-semibold text-center mb-6">El Triunvirato de la Autenticación de Dominio</h3>
-                <p class="text-center text-stone-600 mb-8 max-w-3xl mx-auto">Para combatir la suplantación de identidad, se crearon tres protocolos que trabajan juntos: SPF, DKIM y DMARC. Este gráfico compara sus capacidades clave.</p>
-                <div class="chart-container bg-white p-4 rounded-lg shadow-md">
-                    <canvas id="securityProtocolsChart"></canvas>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección 5: Ecosistema -->
-        <section id="ecosistema" class="content-section">
-            <div class="text-center">
-                <h2 class="text-3xl font-bold text-stone-900">El Ecosistema Completo del Correo</h2>
-                <p class="mt-2 text-lg text-stone-600 max-w-3xl mx-auto">SMTP es para enviar, pero ¿cómo recibimos el correo? Compara SMTP con sus contrapartes de recepción, POP3 e IMAP.</p>
-            </div>
-            <div class="mt-12 max-w-5xl mx-auto">
-                <div class="overflow-x-auto">
-                    <table class="w-full bg-white shadow-lg rounded-lg border border-stone-200">
-                        <thead>
-                            <tr class="bg-stone-100">
-                                <th class="p-4 text-left font-semibold">Característica</th>
-                                <th class="p-4 text-left font-semibold">SMTP</th>
-                                <th class="p-4 text-left font-semibold">POP3</th>
-                                <th class="p-4 text-left font-semibold">IMAP</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="border-t border-stone-200">
-                                <td class="p-4 font-medium">Función Principal</td>
-                                <td class="p-4">Envío y retransmisión</td>
-                                <td class="p-4">Recepción y descarga</td>
-                                <td class="p-4">Recepción y sincronización</td>
-                            </tr>
-                            <tr class="border-t border-stone-200 bg-stone-50">
-                                <td class="p-4 font-medium">Tipo de Protocolo</td>
-                                <td class="p-4">Push (Empuje)</td>
-                                <td class="p-4">Pull (Extracción)</td>
-                                <td class="p-4">Pull (Extracción)</td>
-                            </tr>
-                            <tr class="border-t border-stone-200">
-                                <td class="p-4 font-medium">Almacenamiento</td>
-                                <td class="p-4">No almacena (transfiere)</td>
-                                <td class="p-4">Local (borra del servidor)</td>
-                                <td class="p-4">En el servidor</td>
-                            </tr>
-                            <tr class="border-t border-stone-200 bg-stone-50">
-                                <td class="p-4 font-medium">Soporte Multidispositivo</td>
-                                <td class="p-4 text-red-600 font-semibold">N/A</td>
-                                <td class="p-4 text-orange-500 font-semibold">Pobre</td>
-                                <td class="p-4 text-green-600 font-semibold">Excelente</td>
-                            </tr>
-                            <tr class="border-t border-stone-200">
-                                <td class="p-4 font-medium">Puertos Seguros</td>
-                                <td class="p-4">587 (STARTTLS), 465</td>
-                                <td class="p-4">995</td>
-                                <td class="p-4">993</td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <footer class="text-center py-8 mt-12 border-t border-stone-200">
-        <p class="text-stone-500">Aplicación interactiva generada a partir de una investigación académica sobre SMTP.</p>
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="container mx-auto px-6 py-4 text-center text-sm">
+            <p>&copy; 2024 Análisis Interactivo del Proyecto CUI 2479971. Aplicación generada para fines informativos y de análisis.</p>
+            <p class="text-gray-400 mt-1">Datos extraídos del informe "Análisis Integral del Proyecto de Inversión (CUI 2479971)".</p>
+        </div>
     </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const navLinks = document.querySelectorAll('.nav-link');
-            const sections = document.querySelectorAll('.content-section');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
 
-            function updateActiveState(hash) {
-                let activeSection = document.querySelector(hash);
-                if (!activeSection) {
-                    activeSection = document.querySelector('#fundamentos');
-                    window.location.hash = '#fundamentos';
-                }
-
-                navLinks.forEach(link => {
-                    if (link.getAttribute('href') === window.location.hash) {
-                        link.classList.add('active');
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const content = header.nextElementSibling;
+                    const item = header.parentElement;
+                    
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        item.classList.remove('bg-gray-50');
+                        header.querySelector('span:last-child').textContent = '+';
                     } else {
-                        link.classList.remove('active');
+                        document.querySelectorAll('.accordion-content').forEach(c => c.style.maxHeight = null);
+                        document.querySelectorAll('.accordion-item').forEach(i => i.classList.remove('bg-gray-50'));
+                        document.querySelectorAll('.accordion-header span:last-child').forEach(s => s.textContent = '+');
+
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        item.classList.add('bg-gray-50');
+                        header.querySelector('span:last-child').textContent = '-';
                     }
                 });
-
-                sections.forEach(section => {
-                    if (section.id === activeSection.id) {
-                        section.classList.add('active');
-                    } else {
-                        section.classList.remove('active');
-                    }
-                });
-            }
-            
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    window.location.hash = this.getAttribute('href');
-                });
             });
 
-            window.addEventListener('hashchange', () => updateActiveState(window.location.hash));
-            updateActiveState(window.location.hash || '#fundamentos');
+            const sedaparData = {
+                labels: ['Sin Ejecución / 0% Avance', 'Paralizado', 'En Ejecución', 'Finalizado'],
+                datasets: [{
+                    label: 'Nº de Proyectos',
+                    data: [68, 15, 45, 42],
+                    backgroundColor: [
+                        'rgba(239, 68, 68, 0.7)',
+                        'rgba(245, 158, 11, 0.7)',
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(34, 197, 94, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(239, 68, 68, 1)',
+                        'rgba(245, 158, 11, 1)',
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(34, 197, 94, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
 
-            // Lógica para la sección de Mecánica
-            const sessionSteps = [
-                { type: 'server', command: '220 server.com ESMTP Service ready', title: '1. Saludo del Servidor', text: 'Una vez que el cliente establece una conexión TCP, el servidor responde con un código 220, indicando que está listo para recibir comandos.' },
-                { type: 'client', command: 'EHLO client.example.com', title: '2. Presentación del Cliente (EHLO)', text: 'El cliente se presenta con EHLO (Extended HELO), solicitando al servidor que anuncie las extensiones que soporta (como AUTH o STARTTLS).' },
-                { type: 'server', command: '250-server.com Hello...', title: '3. Anuncio de Extensiones', text: 'El servidor responde con 250 OK y una lista de sus capacidades, como SIZE (tamaño máximo), AUTH (autenticación), y STARTTLS (cifrado).' },
-                { type: 'client', command: 'MAIL FROM:<sender@example.com>', title: '4. Inicio de Transacción (MAIL FROM)', text: 'El cliente inicia la transferencia de un correo, especificando la dirección del remitente del sobre. Esta es la dirección a la que se enviarán los rebotes.' },
-                { type: 'server', command: '250 2.1.0 OK', title: '5. Aceptación del Remitente', text: 'El servidor confirma que la dirección del remitente es sintácticamente correcta y que está listo para recibir la información del destinatario.' },
-                { type: 'client', command: 'RCPT TO:<recipient@example.net>', title: '6. Especificación del Destinatario (RCPT TO)', text: 'El cliente indica la dirección del destinatario. Se puede enviar un comando RCPT TO por cada destinatario.' },
-                { type: 'server', command: '250 2.1.5 OK', title: '7. Aceptación del Destinatario', text: 'El servidor confirma que puede (o intentará) entregar el correo al destinatario especificado.' },
-                { type: 'client', command: 'DATA', title: '8. Solicitud para Enviar Datos (DATA)', text: 'Una vez aceptados el remitente y al menos un destinatario, el cliente indica que está listo para enviar el contenido del mensaje.' },
-                { type: 'server', command: '354 End data with <CRLF>.<CRLF>', title: '9. Invitación a Enviar', text: 'El servidor responde con un código 354, invitando al cliente a enviar el cuerpo del mensaje y a terminarlo con una línea que contenga solo un punto.' },
-                { type: 'client', command: 'From: ... Subject: ... [Cuerpo del mensaje]', title: '10. Transferencia de Datos', text: 'El cliente envía las cabeceras (From, To, Subject) y el cuerpo del mensaje, finalizando con la secuencia <CRLF>.<CRLF>.' },
-                { type: 'server', command: '250 2.0.0 OK: Queued as 12345', title: '11. Confirmación de Recepción', text: 'El servidor confirma que ha recibido el mensaje completo y lo ha puesto en cola para su entrega. La transacción ha sido exitosa.' },
-                { type: 'client', command: 'QUIT', title: '12. Cierre de Sesión (QUIT)', text: 'El cliente indica que ha terminado y desea cerrar la conexión.' },
-                { type: 'server', command: '221 2.0.0 Bye', title: '13. Despedida del Servidor', text: 'El servidor se despide y cierra la conexión TCP.' },
-            ];
-            
-            const clientCommandsDiv = document.getElementById('client-commands');
-            const serverResponsesDiv = document.getElementById('server-responses');
-            const explanationBox = document.getElementById('explanation-box');
-            const explanationTitle = document.getElementById('explanation-title');
-            const explanationText = document.getElementById('explanation-text');
-
-            sessionSteps.forEach((step, index) => {
-                const stepDiv = document.createElement('div');
-                stepDiv.className = 'p-3 rounded-md cursor-pointer transition-all duration-200';
-                stepDiv.textContent = step.command;
-                stepDiv.dataset.index = index;
-
-                if (step.type === 'client') {
-                    stepDiv.classList.add('bg-blue-100', 'text-blue-800', 'border', 'border-blue-200', 'hover:bg-blue-200', 'hover:shadow-md');
-                    clientCommandsDiv.appendChild(stepDiv);
-                } else {
-                    stepDiv.classList.add('bg-green-100', 'text-green-800', 'border', 'border-green-200', 'hover:bg-green-200', 'hover:shadow-md');
-                    serverResponsesDiv.appendChild(stepDiv);
-                }
-
-                stepDiv.addEventListener('click', () => {
-                    explanationTitle.textContent = step.title;
-                    explanationText.textContent = step.text;
-                    explanationBox.classList.remove('opacity-0');
-                    explanationBox.classList.add('opacity-100');
-
-                    document.querySelectorAll('#client-commands > div, #server-responses > div').forEach(d => {
-                        d.classList.remove('ring-2', 'ring-offset-2', 'ring-indigo-500');
-                    });
-                    stepDiv.classList.add('ring-2', 'ring-offset-2', 'ring-indigo-500');
-                });
-            });
-
-            // Lógica para la sección de Evolución
-            const timelineEvents = [
-                { year: 1982, rfc: 'RFC 821', title: 'Nacimiento de SMTP', text: 'Jonathan Postel estandariza SMTP. Diseñado para un entorno de alta confianza (ARPANET), se centra en la fiabilidad sobre la seguridad. Introduce el relaying.' },
-                { year: 1995, rfc: 'RFC 1869', title: 'Llega Extended SMTP (ESMTP)', text: 'Introduce el comando EHLO, permitiendo añadir extensiones como AUTH y STARTTLS sin romper la compatibilidad con servidores antiguos. Es la respuesta a la explosión comercial de Internet.' },
-                { year: 2001, rfc: 'RFC 2821', title: 'Primera Gran Consolidación', text: 'Obsoleta al RFC 821 y consolida las extensiones ESMTP más importantes en un único estándar actualizado, clarificando ambigüedades.' },
-                { year: 2002, rfc: 'RFC 3207', title: 'Cifrado con STARTTLS', text: 'Estandariza la extensión STARTTLS, que permite elevar una conexión de texto plano a una cifrada con TLS, protegiendo los datos en tránsito.' },
-                { year: 2008, rfc: 'RFC 5321', title: 'El Estándar Actual', text: 'Obsoleta al RFC 2821 y se convierte en el estándar de facto. Refina las especificaciones e incorpora las mejores prácticas para la Internet moderna.' },
-                { year: 2011, rfc: 'RFC 6376', title: 'Autenticación con DKIM', text: 'Define DomainKeys Identified Mail, un método de firma criptográfica para verificar la integridad del mensaje y la autoridad del dominio firmante.' },
-                { year: 2014, rfc: 'RFC 7208', title: 'Autorización con SPF', text: 'Define Sender Policy Framework, un mecanismo para que un dominio declare qué IPs están autorizadas a enviar correo en su nombre, validando el sobre SMTP.' },
-                { year: 2015, rfc: 'RFC 7489', title: 'Política y Reportes con DMARC', text: 'Define DMARC, que unifica SPF y DKIM, requiere alineación con la cabecera "From:" y proporciona políticas de acción y reportes de abuso.' },
-            ];
-
-            const timelineContainer = document.getElementById('timeline-container');
-            timelineEvents.forEach(event => {
-                const item = document.createElement('div');
-                item.className = 'timeline-item';
-                item.innerHTML = `
-                    <div class="bg-white p-6 rounded-lg shadow-md border border-stone-200 ml-4">
-                        <p class="text-sm font-semibold text-blue-600">${event.year} - ${event.rfc}</p>
-                        <h4 class="font-bold text-lg mt-1">${event.title}</h4>
-                        <p class="mt-2 text-stone-600">${event.text}</p>
-                    </div>
-                `;
-                timelineContainer.appendChild(item);
-            });
-
-            // Lógica para el gráfico de Seguridad
-            const ctx = document.getElementById('securityProtocolsChart');
-            if (ctx) {
-                new Chart(ctx, {
-                    type: 'radar',
-                    data: {
-                        labels: [
-                            'Valida Sobre (MAIL FROM)',
-                            'Valida Cabecera (From:)',
-                            'Protege Contenido',
-                            'Resiste Reenvío',
-                            'Define Política de Acción',
-                            'Genera Reportes'
-                        ],
-                        datasets: [{
-                            label: 'SPF',
-                            data: [9, 2, 0, 1, 1, 0],
-                            fill: true,
-                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                            borderColor: 'rgb(255, 99, 132)',
-                            pointBackgroundColor: 'rgb(255, 99, 132)',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: 'rgb(255, 99, 132)'
-                        }, {
-                            label: 'DKIM',
-                            data: [2, 8, 9, 9, 2, 0],
-                            fill: true,
-                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                            borderColor: 'rgb(54, 162, 235)',
-                            pointBackgroundColor: 'rgb(54, 162, 235)',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: 'rgb(54, 162, 235)'
-                        }, {
-                            label: 'DMARC',
-                            data: [8, 10, 2, 9, 10, 10],
-                            fill: true,
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            borderColor: 'rgb(75, 192, 192)',
-                            pointBackgroundColor: 'rgb(75, 192, 192)',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: 'rgb(75, 192, 192)'
-                        }]
-                    },
-                    options: {
-                        maintainAspectRatio: false,
-                        scales: {
-                            r: {
-                                angleLines: {
-                                    color: 'rgba(0, 0, 0, 0.1)'
-                                },
-                                suggestedMin: 0,
-                                suggestedMax: 10,
-                                grid: {
-                                    color: 'rgba(0, 0, 0, 0.1)'
-                                },
-                                pointLabels: {
-                                    font: {
-                                        size: 12
-                                    },
-                                    color: '#292524'
-                                },
-                                ticks: {
-                                    backdropColor: 'rgba(255, 255, 255, 0.75)',
-                                    stepSize: 2
+            const sedaparConfig = {
+                type: 'bar',
+                data: sedaparData,
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Estado de 170 Proyectos de SEDAPAR'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.x !== null) {
+                                        label += context.parsed.x + ' proyectos';
+                                    }
+                                    return label;
                                 }
                             }
-                        },
-                        plugins: {
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        let label = context.dataset.label || '';
-                                        if (label) {
-                                            label += ': ';
-                                        }
-                                        label += context.raw;
-                                        return label + '/10';
-                                    }
-                                }
-                            },
-                            legend: {
-                                position: 'top',
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                             title: {
+                                display: true,
+                                text: 'Cantidad de Proyectos'
                             }
                         }
                     }
-                });
-            }
+                }
+            };
+
+            const sedaparCtx = document.getElementById('sedaparProjectsChart').getContext('2d');
+            new Chart(sedaparCtx, sedaparConfig);
+
+            const coverageData = {
+                labels: ['Con Cobertura', 'Sin Cobertura'],
+                datasets: [{
+                    label: 'Pre-Proyecto (75.3%)',
+                    data: [75.3, 24.7],
+                    backgroundColor: ['rgba(245, 158, 11, 0.7)', 'rgba(209, 213, 219, 0.7)'],
+                    borderColor: ['rgba(245, 158, 11, 1)', 'rgba(209, 213, 219, 1)'],
+                    borderWidth: 1
+                }, {
+                    label: 'Post-Proyecto (>95%)',
+                    data: [95, 5],
+                    backgroundColor: ['rgba(34, 197, 94, 0.7)', 'rgba(209, 213, 219, 0.7)'],
+                    borderColor: ['rgba(34, 197, 94, 1)', 'rgba(209, 213, 219, 1)'],
+                    borderWidth: 1,
+                    hidden: true
+                }]
+            };
+
+            const coverageConfig = {
+                type: 'doughnut',
+                data: coverageData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            onClick: (e, legendItem, legend) => {
+                                const index = legendItem.datasetIndex;
+                                const ci = legend.chart;
+                                const meta = ci.getDatasetMeta(index);
+                                meta.hidden = !meta.hidden;
+                                const otherMeta = ci.getDatasetMeta(index === 0 ? 1 : 0);
+                                otherMeta.hidden = !otherMeta.hidden;
+                                ci.update();
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Cobertura de Red Pública (Clic en leyenda para comparar)'
+                        },
+                        tooltip: {
+                             callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed + '%';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            
+            const coverageCtx = document.getElementById('coverageChart').getContext('2d');
+            new Chart(coverageCtx, coverageConfig);
         });
     </script>
 </body>
