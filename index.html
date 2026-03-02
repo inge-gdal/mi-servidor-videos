@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Servidor de Videos</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .video-card { background: #f4f4f4; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
+        video { width: 100%; max-width: 600px; border-radius: 5px; }
+        input, button { padding: 10px; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>Mi Servidor Privado de Videos</h1>
+    
+    <div style="background: #e9ecef; padding: 20px; border-radius: 8px;">
+        <h2>1. Subir un nuevo video</h2>
+        <form id="formularioVideo">
+            <input type="text" id="titulo" placeholder="Título del video" required style="width: 80%;"><br>
+            <input type="file" id="archivoVideo" accept="video/*" required><br>
+            <button type="submit" style="background: #007bff; color: white; border: none; cursor: pointer;">Subir al Servidor</button>
+        </form>
+    </div>
+
+    <h2>2. Galería de Videos</h2>
+    <button onclick="cargarVideos()" style="margin-bottom: 15px;">🔄 Actualizar Lista</button>
+    <div id="galeria"></div>
+
+    <script>
+        // La IP de tu VPS
+        const IP_SERVIDOR = 'http://107.173.229.50:3000';
+
+        // Lógica para enviar el video al servidor
+        document.getElementById('formularioVideo').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = e.target.querySelector('button');
+            btn.textContent = 'Subiendo...';
+            btn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('titulo', document.getElementById('titulo').value);
+            formData.append('video', document.getElementById('archivoVideo').files[0]);
+
+            try {
+                const respuesta = await fetch(`${IP_SERVIDOR}/subir`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await respuesta.json();
+                
+                if(respuesta.ok) {
+                    alert('¡Video subido correctamente!');
+                    document.getElementById('formularioVideo').reset();
+                    cargarVideos();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Ocurrió un error al intentar subir el archivo.');
+                console.error(error);
+            } finally {
+                btn.textContent = 'Subir al Servidor';
+                btn.disabled = false;
+            }
+        });
+
+        // Lógica para pedir los videos a la base de datos y mostrarlos
+        async function cargarVideos() {
+            const galeria = document.getElementById('galeria');
+            galeria.innerHTML = '<p>Cargando videos...</p>';
+
+            try {
+                const respuesta = await fetch(`${IP_SERVIDOR}/videos`);
+                const videos = await respuesta.json();
+                
+                galeria.innerHTML = ''; // Limpiar galería
+
+                if(videos.length === 0) {
+                    galeria.innerHTML = '<p>No hay videos subidos aún.</p>';
+                    return;
+                }
+
+                videos.forEach(video => {
+                    galeria.innerHTML += `
+                        <div class="video-card">
+                            <h3>${video.titulo}</h3>
+                            <video controls preload="metadata">
+                                <source src="${IP_SERVIDOR}${video.ruta_video}" type="video/mp4">
+                                Tu navegador no soporta la reproducción de este video.
+                            </video>
+                            <p><small>Subido el: ${new Date(video.fecha_subida).toLocaleString()}</small></p>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                galeria.innerHTML = '<p style="color:red;">Error al cargar los videos. Revisa la consola o que tu servidor esté encendido.</p>';
+                console.error('Error al cargar videos:', error);
+            }
+        }
+
+        // Cargar los videos automáticamente al abrir la página
+        window.onload = cargarVideos;
+    </script>
+</body>
+</html>
