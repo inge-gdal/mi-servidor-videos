@@ -1,25 +1,49 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Servidor de Videos</title>
+    <title>Mi Servidor de Holis</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        .video-card { background: #f4f4f4; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
-        video { width: 100%; max-width: 600px; border-radius: 5px; }
-        input, button { padding: 10px; margin: 5px 0; }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .video-card {
+            background: #f4f4f4;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        video {
+            width: 100%;
+            max-width: 600px;
+            border-radius: 5px;
+        }
+
+        input,
+        button {
+            padding: 10px;
+            margin: 5px 0;
+        }
     </style>
 </head>
+
 <body>
-    <h1>Mi Servidor Privado de Videos</h1>
-    
+    <h1>Mi Servidor Privado de holi</h1>
+
     <div style="background: #e9ecef; padding: 20px; border-radius: 8px;">
         <h2>1. Subir un nuevo video</h2>
         <form id="formularioVideo">
             <input type="text" id="titulo" placeholder="Título del video" required style="width: 80%;"><br>
             <input type="file" id="archivoVideo" accept="video/*" required><br>
-            <button type="submit" style="background: #007bff; color: white; border: none; cursor: pointer;">Subir al Servidor</button>
+            <button type="submit" style="background: #007bff; color: white; border: none; cursor: pointer;">Subir al
+                Servidor</button>
         </form>
     </div>
 
@@ -34,7 +58,7 @@
         // Lógica para enviar el video al servidor
         document.getElementById('formularioVideo').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const btn = e.target.querySelector('button');
             btn.textContent = 'Subiendo...';
             btn.disabled = true;
@@ -49,8 +73,8 @@
                     body: formData
                 });
                 const data = await respuesta.json();
-                
-                if(respuesta.ok) {
+
+                if (respuesta.ok) {
                     alert('¡Video subido correctamente!');
                     document.getElementById('formularioVideo').reset();
                     cargarVideos();
@@ -74,10 +98,10 @@
             try {
                 const respuesta = await fetch(`${IP_SERVIDOR}/videos`);
                 const videos = await respuesta.json();
-                
+
                 galeria.innerHTML = ''; // Limpiar galería
 
-                if(videos.length === 0) {
+                if (videos.length === 0) {
                     galeria.innerHTML = '<p>No hay videos subidos aún.</p>';
                     return;
                 }
@@ -104,4 +128,5 @@
         window.onload = cargarVideos;
     </script>
 </body>
+
 </html>
